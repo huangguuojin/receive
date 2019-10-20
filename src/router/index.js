@@ -9,7 +9,7 @@ import RepairFactoryRelation from '@/views/repairfactory/RepairFactoryRelation'
 import Parts from '@/views/parts/Parts'
 import Draft from '@/views/order/draft/Draft'
 import Release from '@/views/order/Release'
-import Distribute from '@/views/order/Distribute'
+import Distribute from '@/views/order/distribute/Distribute'
 Vue.use(Router)
 
 const router = new Router({
