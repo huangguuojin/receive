@@ -8,32 +8,39 @@
       <el-form ref="form" :model="form" label-width="80px">
       </el-form>
     </el-row>
-    <el-row class="right">
-      <el-col :span="22" class="el-col-22">
-      </el-col>
-      <el-col :span="1" class="btn">
-        <el-button type="primary" @click="onCreate">创建</el-button>
-        <v-create v-if="addVisible" :visible.sync="addVisible" @loadData="loadData()"></v-create>
-        <v-edit v-if="editVisible" :visible.sync="editVisible" v-bind:id="id" @loadData="loadData()"></v-edit>
-      </el-col>
-      <el-col :span="1" class="btn"></el-col>
-      <el-col :span="1" class="btn">
-        <el-button type="primary" @click="onExport">导出</el-button>
-      </el-col>
-      <el-col :span="1" class="btn"></el-col>
-      <el-col :span="1" class="btn">
+    <el-row :gutter="20">
+      <el-col :span="6"> <el-button type="primary" @click="onSend" icon="el-icon-setting">批量发布</el-button></el-col>
+      <el-col :span="6"> <el-button type="primary" @click="onCreate" icon="el-icon-circle-plus">创建</el-button></el-col>
+      <el-col :span="6"> <el-button type="primary" @click="onExport" icon="el-icon-download">导出</el-button></el-col>
+      <el-col :span="6">
         <el-upload
                 class="upload-demo"
                 action="/api/order/importOrder"
                 :on-preview="handlePreview"
                 :show-file-list="false"
-                 name="files"
-                 :headers="header"
+                name="files"
+                :headers="header"
                 :on-exceed="handleExceed"
                 :on-success="handleSuccess"
         >
-          <el-button  type="primary">上传</el-button>
+          <el-button  type="primary" icon="el-icon-upload">上传</el-button>
         </el-upload>
+      </el-col>
+    </el-row>
+    <el-row class="right">
+      <el-col :span="22" class="el-col-22">
+      </el-col>
+
+      <el-col :span="1" class="btn">
+        <v-create v-if="addVisible" :visible.sync="addVisible" @loadData="loadData()"></v-create>
+        <v-edit v-if="editVisible" :visible.sync="editVisible" v-bind:id="id" @loadData="loadData()"></v-edit>
+      </el-col>
+      <el-col :span="1" class="btn"></el-col>
+      <el-col :span="1" class="btn">
+
+      </el-col>
+      <el-col :span="1" class="btn"></el-col>
+      <el-col :span="1" class="btn">
       </el-col>
     </el-row>
     <el-row class="table">
@@ -44,7 +51,8 @@
             border
             header-row-class-name="head"
             style="width: 100%"
-            @selection-change="handleSelectionChange"
+            @select="onSelect"
+            @select-all="handleSelectionChange"
           >
             <el-table-column
               type="selection"
@@ -123,12 +131,12 @@
             <el-table-column
               fixed="right"
               label="操作"
-              width="200">
+              width="250">
               <template slot-scope="scope">
-                <el-button @click="handleClick(scope.row.id)" type="button" size="small">
-                  修改
+                <el-button @click="handleClick(scope.row.id)"  type="primary" icon="el-icon-edit">
+                  编辑
                 </el-button>
-                <el-button type="button" size="small" @click="onDel(scope.row.id, scope.row.status)">删除</el-button>
+                <el-button type="primary" icon="el-icon-delete" @click="onDel(scope.row.id)">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -169,6 +177,7 @@
           page: 1,
           pageSize: 10
         },
+        selectAll: false,
         role: [],
         tableData: [],
         pageList: [10, 20, 50, 100],
@@ -178,12 +187,13 @@
         id: 0,
         multipleSelection: [],
         header:{
-          Authorization: '',
-        }
+          Authorization: ''
+        },
+        idArr: []
       }
     },
     created: function () {
-      let Authorization = localStorage.getItem('Authorization');
+      let Authorization = localStorage.getItem('Authorization')
       this.header.Authorization = Authorization
       this.loadData();
     },
@@ -212,16 +222,24 @@
       },
       onDel(id) {
         let _this = this;
-        _this.$confirm('是否要删除区域?', '提示', {
+        _this.$confirm('是否要删除订单?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          Vue.axios.post('/api/area/del', {id: id}).then(res => {
-            this.$message({
-              type: 'success',
-              message: '删除成功!'
-            });
+          Vue.axios.post('/api/order/del', {id: id}).then(res => {
+            if(res.data.code === 200){
+              this.$message({
+                type: 'success',
+                message: '删除成功!'
+              });
+            }else {
+              this.$message({
+                type: 'fail',
+                message: '删除失败!'
+              });
+            }
+
             _this.loadData()
           }).catch(error => {
             console.log(error)
@@ -253,15 +271,52 @@
         })
       },
       handleSelectionChange(val) {
-        this.multipleSelection = val;
-        console.log(val)
+        let _this = this
+        _this.multipleSelection = val
+        if(val.length !== 0){
+          for (let i = 0 ; i < val.length; i++){
+            _this.idArr.push(val[i].id)
+          }
+        }else {
+          _this.idArr = []
+        }
+
+        console.log(_this.idArr)
       },
       handleExceed(files, fileList) {
         this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
       },
       handlePreview(file) {
-        console.log(file);
+        console.log(file)
       },
+      onSend(){
+        let _this = this
+        if(_this.idArr.length === 0){
+          this.$message.warning(`没有选择要发布的订单，请选择订单`)
+        }
+        Vue.axios.post('/api/order/send', {idArr: _this.idArr}).then(res => {
+          this.$message({
+            type: 'success',
+            message: '发布成功!'
+          })
+          _this.loadData()
+        }).catch(error => {
+          console.log(error)
+        })
+      },
+      onSelect(selection, row){
+        let _this = this
+       if(selection.length === 0){
+         for (let i = 0; i < _this.idArr.length; i++){
+           if(_this.idArr[i] === row.id){
+             _this.idArr.splice(i, 1)
+           }
+         }
+       }else {
+         _this.idArr.push(row.id)
+       }
+         console.log(_this.idArr)
+      }
 
     },
     components: {
