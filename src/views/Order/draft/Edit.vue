@@ -199,7 +199,7 @@
                     <el-button type="primary" icon="el-icon-s-claim" @click="onSend">发布派单</el-button>
                 </el-col>
                 <el-col :span="6">
-                    <el-button type="primary" icon="el-icon-success">申请完结</el-button>
+                    <el-button type="primary" icon="el-icon-success" @click="onFinish">申请完结</el-button>
                 </el-col>
             </el-row>
         </el-dialog>
@@ -490,6 +490,28 @@
                      console.log(error)
                 })
             },
+            onFinish(){
+                let _this = this
+                _this.form.status = 5
+                Vue.axios.post('/api/order/updateRecord', this.form).then(res => {
+                    if(res.data.code === 200){
+                        this.$message({
+                            type: 'success',
+                            message: '完成成功!'
+                        })
+                    }else {
+                        this.$message({
+                            type: 'fail',
+                            message: '完成失败!'
+                        })
+                    }
+
+                    _this.$emit('update:visible', false)
+                    _this.$emit('loadData')
+                }).catch(error => {
+                    console.log(error)
+                })
+            }
         }
     }
 </script>
