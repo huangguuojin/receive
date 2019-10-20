@@ -26,16 +26,16 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item label="保险公司">
-                        <el-select v-model="form.inId" filterable placeholder="请选择"
-                                   v-on:change="insuranceChange(form.inId)">
-                            <el-option
-                                    v-for="(item,index) in insurance"
-                                    :key="index"
-                                    :label="item.name"
-                                    :value="item.id">
-                            </el-option>
-                        </el-select>
-                    </el-form-item>
+                            <el-select v-model="form.inId" filterable placeholder="请选择"
+                                       v-on:change="insuranceChange(form.inId)">
+                                <el-option
+                                        v-for="(item,index) in insurance"
+                                        :key="index"
+                                        :label="item.name"
+                                        :value="item.id">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
                         <el-form-item label="保险公司联系人" size="large">
                             <el-select v-model="form.inRid" filterable placeholder="请选择">
                                 <el-option
