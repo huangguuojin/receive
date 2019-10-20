@@ -53,6 +53,7 @@
             style="width: 100%"
             @select="onSelect"
             @select-all="handleSelectionChange"
+            @row-click="onRowClick"
           >
             <el-table-column
               type="selection"
@@ -316,7 +317,10 @@
          _this.idArr.push(row.id)
        }
          console.log(_this.idArr)
-      }
+      },
+        onRowClick(row, column, event){
+           this.handleClick(row.id)
+        }
 
     },
     components: {
