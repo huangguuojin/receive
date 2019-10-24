@@ -14,6 +14,7 @@
         <el-col :span="6" class="el-col">
           <el-form-item label="角色">
             <el-select v-model="form.role" placeholder="角色">
+              <el-option label="全部" value= '-1'></el-option>
               <el-option
                 v-for="(item,index) in role"
                 :key="index"
@@ -26,7 +27,7 @@
         <el-col :span="6" class="ec-col-6">
           <el-form-item label="状态">
             <el-select v-model="form.status" placeholder="状态">
-              <el-option label="全部" value=-1></el-option>
+              <el-option label="全部" value="-1"></el-option>
               <el-option label="启用" value=1></el-option>
               <el-option label="冻结" value=2></el-option>
             </el-select>
@@ -60,6 +61,7 @@
             :data="tableData"
             border
             header-row-class-name="head"
+            @row-click="rowClick"
             style="width: 100%">
             <el-table-column
               type="index"
@@ -107,14 +109,12 @@
               width="100">
             </el-table-column>
             <el-table-column
-              fixed="right"
               label="操作"
               width="200">
               <template slot-scope="scope">
-                <el-button @click="handleClick(scope.row.id)" type="button" size="small"
-                           v-if="scope.row.status === 1">修改
+                <el-button @click="handleClick(scope.row.id)" type="button" size="small" v-if="scope.row.statusCode === 1">修改
                 </el-button>
-                <el-button type="button" size="small" @click="onEnable(scope.row.id, scope.row.status)">{{scope.row.status === 1? '冻结':'启用'}}</el-button>
+                <el-button type="button" size="small" @click="onEnable(scope.row.id, scope.row.statusCode)">{{scope.row.statusCode === 1? '冻结':'启用'}}</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -234,13 +234,17 @@
       },
       roleList() {
         Vue.axios.post('/api/common/getRole').then(res => {
-          let data = res.data.data;
-          let _this = this;
-          _this.role = data;
+          let data = res.data.data
+          let _this = this
+          _this.role = data
           console.log(data)
         }).catch(error => {
           console.log(error)
         })
+      },
+      rowClick(row, event, clone){
+        this.editVisible = true;
+        this.id = row.id
       }
 
     },

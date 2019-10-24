@@ -130,7 +130,6 @@
               width="100">
             </el-table-column>
             <el-table-column
-              fixed="right"
               label="操作"
               width="250">
               <template slot-scope="scope">
@@ -176,7 +175,16 @@
           //     region: '全部',
           status: 1,
           page: 1,
-          pageSize: 10
+          pageSize: 10,
+          area:'',
+          rfId: '',
+          inId: '',
+          partStatus: '',
+          innerWorkerId: '',
+          outWorkId: '',
+          keyword: '',
+          createStartTime: '',
+          createEndTime: ''
         },
         selectAll: false,
         role: [],
@@ -256,7 +264,7 @@
            this.loadData()
       },
       loadData() {
-        let Authorization = localStorage.getItem('Authorization');
+        let Authorization = localStorage.getItem('Authorization')
         Vue.axios.post('/api/order/listAll', this.form, {headers: {Authorization: Authorization}}).then(res => {
           let data = res.data.data;
           let _this = this;

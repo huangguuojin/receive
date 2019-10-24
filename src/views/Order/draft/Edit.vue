@@ -179,6 +179,7 @@
                     <el-upload
                             action="/api/common/upload"
                             list-type="picture-card"
+                            :multiple=true
                             :show-file-list=true
                             :on-preview="handlePictureCardPreview"
                             :on-remove="handleRemove"
@@ -295,6 +296,7 @@
                         name: '其他'
                     }
                 ],
+
                 insurance: [],
                 insuranceRelation: [],
                 repairFactory: [],
@@ -348,12 +350,12 @@
         methods: {
             cancelModal() {
                 // 关闭弹窗，触发父组件修改visible值
-                this.$emit('update:visible', false);
+                this.$emit('update:visible', false)
             },
             onSubmit() {
                 let _this = this
                 Vue.axios.post('/api/area/updateInfo', _this.form).then(function (res) {
-                    _this.$emit('update:visible', false);
+                    _this.$emit('update:visible', false)
                     _this.$emit('loadData')
                 }).catch(function (error) {
                 })
@@ -445,7 +447,7 @@
             },
             handleSuccess(response, file, fileList) {
                 let _this = this
-                _this.form.dialogImageUrl.push({id: 0, url: response.data.fileName, type: 1})
+                _this.form.dialogImageUrl.push({ url: response.data.fileName, type: 1})
             },
             onDel(index){
                 let len = this.form.parts.length
